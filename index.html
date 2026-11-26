@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Revils | ريفلز - نظام محاسبة لشركات الصرافة</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2313141b'/><text x='50' y='70' font-size='58' text-anchor='middle' fill='%236366f1' font-family='Arial' font-weight='800'>R</text></svg>" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    /* Colors extracted from your screenshot */
+    --bg-main: #121318;
+    --bg-card: #1c1e26;
+    --bg-input: #0f1014;
+    --primary: #6366f1; /* Purple/Indigo */
+    --primary-hover: #4f46e5;
+    --teal: #00E5A0; /* Buy Button */
+    --red: #FF453A; /* Sell Button */
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --border: #2e323f;
+    
+    --radius: 12px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+    --shadow-md: 0 8px 24px -8px rgba(0,0,0,0.4);
+    --shadow-lg: 0 24px 60px -20px rgba(0,0,0,0.6);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  
+  body { 
+    background-color: var(--bg-main); 
+    color: var(--text-main); 
+    line-height: 1.6; 
+    -webkit-font-smoothing: antialiased;
+    transition: font-family 0.3s ease;
+  }
+  
+  /* Font switching based on language */
+  html[lang="ar"] body { font-family: 'Cairo', sans-serif; }
+  html[lang="en"] body { font-family: 'Inter', sans-serif; }
+
+  a { color: inherit; text-decoration: none; }
+  img, svg { display: block; max-width: 100%; }
+  .container { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
+
+  /* ---------- NAV ---------- */
+  header { position: sticky; top: 0; z-index: 50; background: rgba(18, 19, 24, 0.85); backdrop-filter: blur(12px); border-bottom: 1px solid transparent; transition: border-color 0.2s; }
+  header.scrolled { border-bottom-color: var(--border); }
+  .nav { display: flex; align-items: center; justify-content: space-between; height: 72px; }
+  .logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.3rem; letter-spacing: -0.02em; color: #fff; }
+  .logo-mark { width: 36px; height: 36px; border-radius: 10px; background: var(--bg-card); border: 1px solid var(--border); color: var(--primary); display: grid; place-items: center; font-weight: 800; font-size: 1.1rem; }
+  
+  .nav-links { display: flex; gap: 32px; align-items: center; }
+  .nav-links a { font-size: 0.95rem; font-weight: 600; color: var(--text-muted); transition: color 0.15s; }
+  .nav-links a:hover { color: var(--text-main); }
+  
+  .nav-cta { display: flex; gap: 16px; align-items: center; }
+  
+  /* Language Toggle Button */
+  .lang-btn { background: transparent; color: var(--text-muted); border: 1px solid var(--border); padding: 8px 14px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
+  .lang-btn:hover { color: var(--text-main); border-color: var(--text-muted); }
+  
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 11px 22px; border-radius: 10px; font-weight: 700; font-size: 0.95rem; transition: all 0.2s; cursor: pointer; border: none; font-family: inherit; }
+  .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3); }
+  .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
+  .btn-teal { background: var(--teal); color: #000; box-shadow: 0 4px 14px rgba(0, 229, 160, 0.2); }
+  .btn-teal:hover { background: #00c98b; transform: translateY(-1px); }
+  .btn-ghost { background: transparent; color: var(--text-main); border: 1px solid var(--border); }
+  .btn-ghost:hover { background: var(--bg-card); border-color: var(--text-muted); }
+  .btn-lg { padding: 14px 28px; font-size: 1.05rem; border-radius: 12px; }
+
+  /* ---------- HERO ---------- */
+  .hero { padding: 80px 0 60px; position: relative; overflow: hidden; }
+  .hero::before { content: ""; position: absolute; top: -20%; left: 50%; width: 600px; height: 600px; background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 60%); transform: translateX(-50%); z-index: -1; }
+  
+  .hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+  
+  .badge { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 999px; background: var(--bg-card); border: 1px solid var(--border); font-size: 0.85rem; font-weight: 700; color: var(--primary); margin-bottom: 24px; }
+  
+  h1 { font-size: clamp(2.2rem, 4vw, 3.2rem); line-height: 1.15; font-weight: 800; margin-bottom: 24px; }
+  .gradient-text { background: linear-gradient(90deg, var(--primary), var(--teal)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  
+  .hero-sub { font-size: 1.15rem; color: var(--text-muted); max-width: 500px; margin-bottom: 32px; line-height: 1.7; }
+  .hero-cta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px;}
+  
+  /* Hero Trust Badge */
+  .hero-trust { display: flex; align-items: center; gap: 12px; font-size: 0.9rem; color: var(--text-muted); font-weight: 600; }
+  .hero-trust .stars { color: #FBBF24; display: flex; gap: 2px; }
+
+  /* ---------- MOCKUP (From Screenshot) ---------- */
+  .mockup-wrapper { perspective: 1000px; }
+  .mockup { 
+    background: var(--bg-main); 
+    border: 1px solid var(--border); 
+    border-radius: 16px; 
+    box-shadow: var(--shadow-lg); 
+    overflow: hidden; 
+    transform: rotateY(-5deg) rotateX(2deg); 
+    transition: transform 0.5s ease;
+    display: flex;
+    flex-direction: column;
+  }
+  .mockup:hover { transform: rotateY(0) rotateX(0); }
+  
+  .m-header { background: var(--primary); padding: 12px 16px; display: flex; align-items: center; gap: 16px; color: #fff; }
+  .m-header .m-logo { font-weight: 800; font-size: 1rem; display: flex; align-items: center; gap: 8px; }
+  .m-header .m-nav { display: flex; gap: 12px; font-size: 0.75rem; opacity: 0.8; font-weight: 600; }
+  
+  .m-body { padding: 20px; background: var(--bg-main); display: flex; flex-direction: column; gap: 16px; }
+  .m-panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
+  .m-panel-title { font-size: 0.85rem; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; color: #fff; }
+  
+  .m-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .m-group { display: flex; flex-direction: column; gap: 6px; }
+  .m-label { font-size: 0.7rem; color: var(--text-muted); }
+  .m-input { background: var(--bg-input); border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; color: #fff; font-size: 0.85rem; font-family: inherit; }
+  
+  .m-toggles { display: flex; gap: 8px; }
+  .m-toggle { flex: 1; text-align: center; padding: 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; border: 1px solid transparent; }
+  .m-toggle.buy { background: var(--teal); color: #000; }
+  .m-toggle.sell { background: var(--bg-input); color: var(--red); border-color: var(--border); }
+  
+  .m-result { background: #3b3a7a; border-radius: 8px; padding: 20px; text-align: center; margin-top: 12px; }
+  .m-result-label { font-size: 0.75rem; color: rgba(255,255,255,0.7); margin-bottom: 4px; }
+  .m-result-val { font-size: 2rem; font-weight: 800; color: #fff; }
+
+  /* ---------- TRUST STATS SECTION ---------- */
+  .trust-stats { padding: 40px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); background: rgba(28, 30, 38, 0.4); }
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; text-align: center; }
+  .stat-item h3 { font-size: 2.2rem; font-weight: 800; color: var(--teal); margin-bottom: 8px; line-height: 1; direction: ltr; }
+  .stat-item p { font-size: 0.95rem; color: var(--text-muted); font-weight: 600; }
+
+  /* ---------- FEATURES ---------- */
+  section { padding: 96px 0; }
+  .features { background: var(--bg-main); }
+  .section-head { text-align: center; max-width: 680px; margin: 0 auto 56px; }
+  .eyebrow { display: inline-block; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--primary); margin-bottom: 12px; }
+  h2 { font-size: clamp(1.8rem, 3vw, 2.5rem); font-weight: 800; line-height: 1.2; margin-bottom: 16px; }
+  .section-head p { color: var(--text-muted); font-size: 1.1rem; }
+
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px; transition: transform 0.2s, border-color 0.2s; }
+  .card:hover { transform: translateY(-4px); border-color: var(--primary); }
+  .card .icon { width: 48px; height: 48px; border-radius: 12px; background: rgba(99, 102, 241, 0.1); color: var(--primary); display: grid; place-items: center; margin-bottom: 20px; }
+  .card h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 10px; }
+  .card p { font-size: 0.95rem; color: var(--text-muted); line-height: 1.6; }
+
+  /* ---------- CONTACT ---------- */
+  .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+  .contact-info { display: flex; flex-direction: column; gap: 24px; }
+  .contact-item { display: flex; align-items: center; gap: 16px; background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: var(--radius); }
+  .contact-item .icon { width: 40px; height: 40px; border-radius: 50%; background: rgba(99, 102, 241, 0.1); color: var(--primary); display: grid; place-items: center; }
+  .contact-item .text span { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px; }
+  .contact-item .text strong { font-size: 1.1rem; font-weight: 700; color: #fff; direction: ltr; display: inline-block; }
+
+  /* ---------- FOOTER ---------- */
+  footer { background: var(--bg-main); border-top: 1px solid var(--border); padding: 40px 0; text-align: center; color: var(--text-muted); font-size: 0.9rem; }
+  footer .logo { justify-content: center; margin-bottom: 16px; }
+  
+  /* Made in Syria */
+  .made-in { margin-top: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; color: var(--text-main); }
+  .made-in svg { border-radius: 2px; box-shadow: 0 0 2px rgba(255,255,255,0.2); }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 980px) {
+    .hero-grid { grid-template-columns: 1fr; gap: 48px; }
+    .mockup { transform: none; max-width: 600px; margin: 0 auto; }
+    .grid-3 { grid-template-columns: 1fr 1fr; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .contact-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 720px) {
+    .nav-links { display: none; }
+    .grid-3 { grid-template-columns: 1fr; }
+    h1 { font-size: 2rem; }
+    section { padding: 64px 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<header id="header">
+  <div class="container nav">
+    <a class="logo" href="#top">
+      <span class="logo-mark">R</span> 
+      <span data-i18n="nav_logo">Revils</span>
+    </a>
+    <nav class="nav-links">
+      <a href="#features" data-i18n="nav_features">المميزات</a>
+      <a href="#contact" data-i18n="nav_contact">اتصل بنا</a>
+    </nav>
+    <div class="nav-cta">
+      <button class="lang-btn" onclick="toggleLanguage()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <span id="lang-text">English</span>
+      </button>
+      <a href="#contact" class="btn btn-primary" data-i18n="nav_demo">طلب عرض توضيحي</a>
+    </div>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="hero" id="top">
+  <div class="container hero-grid">
+    <div class="hero-content">
+      <span class="badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        <span data-i18n="hero_badge">مصمم خصيصاً لشركات الصرافة</span>
+      </span>
+      <h1 data-i18n="hero_title">وداعاً لإكسل. <br><span class="gradient-text">نظام محاسبي متكامل</span> لأعمالك.</h1>
+      <p class="hero-sub" data-i18n="hero_sub">ريفلز يستبدل الجداول الإلكترونية (إكسل) والفوضى بنظام محاسبي احترافي. تتبع العملات المتعددة، سجل العمليات، واستخرج التقارير بضغطة زر.</p>
+      <div class="hero-cta">
+        <a href="#features" class="btn btn-teal btn-lg" data-i18n="hero_cta1">اكتشف المميزات</a>
+        <a href="#contact" class="btn btn-ghost btn-lg" data-i18n="hero_cta2">تواصل معنا</a>
+      </div>
+      <!-- Trust Indicator in Hero -->
+      <div class="hero-trust">
+        <div class="stars">
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+        </div>
+        <span data-i18n="hero_trust">موثوق من قبل +15 شركة صرافة حول العالم</span>
+      </div>
+    </div>
+
+    <!-- Mockup -->
+    <div class="mockup-wrapper">
+      <div class="mockup" aria-hidden="true">
+        <div class="m-header">
+          <div class="m-logo">
+             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+             المحول
+          </div>
+          <div class="m-nav">
+            <span>السجل</span>
+            <span>الإعدادات</span>
+            <span>معلومات</span>
+          </div>
+        </div>
+        <div class="m-body">
+          <div class="m-panel">
+            <div class="m-panel-title">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+              تفاصيل العملية
+            </div>
+            <div class="m-row">
+              <div class="m-group">
+                <span class="m-label">نوع العملية</span>
+                <div class="m-toggles">
+                  <div class="m-toggle buy">↑ شراء</div>
+                  <div class="m-toggle sell">↓ بيع</div>
+                </div>
+              </div>
+              <div class="m-group">
+                <span class="m-label">العملة</span>
+                <div class="m-input" style="display: flex; justify-content: space-between; align-items: center;">
+                  USD <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                </div>
+              </div>
+            </div>
+            <div class="m-row">
+              <div class="m-group">
+                <span class="m-label">المبلغ</span>
+                <div class="m-input" style="text-align: left;" dir="ltr">100</div>
+              </div>
+              <div class="m-group">
+                <span class="m-label">سعر الصرف</span>
+                <div class="m-input" style="text-align: left;" dir="ltr">152</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="m-result">
+            <div class="m-result-label">القيمة المحسوبة</div>
+            <div class="m-result-val" dir="ltr">15,200</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TRUST STATS ============ -->
+<section class="trust-stats">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-item">
+        <h3>+15</h3>
+        <p data-i18n="stat_1">شركة صرافة تثق بنا</p>
+      </div>
+      <div class="stat-item">
+        <h3>+1M</h3>
+        <p data-i18n="stat_2">عملية تمت معالجتها</p>
+      </div>
+      <div class="stat-item">
+        <h3>99.9%</h3>
+        <p data-i18n="stat_3">استقرار ووقت تشغيل</p>
+      </div>
+      <div class="stat-item">
+        <h3>100%</h3>
+        <p data-i18n="stat_4">جاهزية للتدقيق المالي</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FEATURES ============ -->
+<section class="features" id="features">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow" data-i18n="feat_eyebrow">المميزات</span>
+      <h2 data-i18n="feat_title">كل ما تحتاجه شركة الصرافة. في مكان واحد.</h2>
+      <p data-i18n="feat_sub">تم تصميم ريفلز ليلغي الاعتماد على إكسل ويوفر لك أدوات احترافية لإدارة أعمالك اليومية.</p>
+    </div>
+    <div class="grid-3">
+      
+      <!-- WhatsApp -->
+      <div class="card">
+        <div class="icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        </div>
+        <h3 data-i18n="feat_wa_title">سجلات واتساب</h3>
+        <p data-i18n="feat_wa_desc">يتم إرسال تقرير بكل عملية تلقائياً إلى محادثتك أو مجموعتك على واتساب لضمان الشفافية.</p>
+      </div>
+
+      <!-- PDF Export -->
+      <div class="card">
+        <div class="icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        </div>
+        <h3 data-i18n="feat_pdf_title">تصدير PDF</h3>
+        <p data-i18n="feat_pdf_desc">تصدير تفاصيل العمليات والتقارير المالية في ملفات PDF احترافية بسهولة تامة.</p>
+      </div>
+
+      <!-- Overview -->
+      <div class="card">
+        <div class="icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        </div>
+        <h3 data-i18n="feat_ov_title">صفحة النظرة العامة</h3>
+        <p data-i18n="feat_ov_desc">لوحة تحكم تفاعلية تعرض لك حجم التداول والأرباح وحركة العملات في الوقت الفعلي.</p>
+      </div>
+
+      <!-- Detailed Summary -->
+      <div class="card">
+        <div class="icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </div>
+        <h3 data-i18n="feat_sum_title">صفحة الملخص التفصيلي</h3>
+        <p data-i18n="feat_sum_desc">تقارير مفصلة لكل حركة، مع إمكانية تصفية العمليات حسب التاريخ أو العملة أو الموظف.</p>
+      </div>
+
+      <!-- Arabic/English -->
+      <div class="card">
+        <div class="icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        </div>
+        <h3 data-i18n="feat_lang_title">دعم اللغتين</h3>
+        <p data-i18n="feat_lang_desc">واجهة مستخدم كاملة تدعم اللغتين العربية والإنجليزية، مع تغيير فوري للاتجاه (RTL / LTR).</p>
+      </div>
+
+      <!-- Multi-currency -->
+      <div class="card">
+        <div class="icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9 10h4.5a1.5 1.5 0 0 1 0 3H9"/></svg>
+        </div>
+        <h3 data-i18n="feat_curr_title">تعدد العملات</h3>
+        <p data-i18n="feat_curr_desc">تسجيل العمليات بكل العملات التي تتعامل بها، مع حفظ سعر الصرف في لحظة إتمام العملية.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ CONTACT ============ -->
+<section id="contact">
+  <div class="container">
+    <div class="contact-grid">
+      <div>
+        <span class="eyebrow" data-i18n="contact_eyebrow">تواصل معنا</span>
+        <h2 data-i18n="contact_title">جاهز للانتقال من إكسل إلى ريفلز؟</h2>
+        <p style="color: var(--text-muted); font-size: 1.1rem; margin-top: 16px;" data-i18n="contact_sub">انضم إلى مئات شركات الصرافة التي تعتمد على ريفلز. فريقنا جاهز للإجابة على استفساراتك وتقديم عرض توضيحي.</p>
+      </div>
+      
+      <div class="contact-info">
+        <!-- Phone -->
+        <div class="contact-item">
+          <div class="icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          </div>
+          <div class="text">
+            <span data-i18n="contact_phone_label">رقم الهاتف</span>
+            <strong>+963 998 416 953</strong>
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="contact-item">
+          <div class="icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <div class="text">
+            <span data-i18n="contact_email_label">البريد الإلكتروني</span>
+            <strong>Support@revils.net</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="container">
+    <a class="logo" href="#top">
+      <span class="logo-mark">R</span> Revils
+    </a>
+    <p id="footer-copy">© <span id="year"></span> Revils. جميع الحقوق محفوظة.</p>
+    
+    <!-- Made in Syria with Flag -->
+    <div class="made-in">
+      <span data-i18n="made_in">صنع في سوريا</span>
+      <svg width="24" height="16" viewBox="0 0 900 600" style="border-radius: 2px; box-shadow: 0 0 3px rgba(255,255,255,0.15);">
+        <rect width="900" height="200" fill="#007A3D"/>
+        <rect y="200" width="900" height="200" fill="#FFFFFF"/>
+        <rect y="400" width="900" height="200" fill="#000000"/>
+        <!-- 3 Red Stars -->
+        <path d="M 300 260 L 310.5 288 L 340 288 L 316 306 L 325 335 L 300 316 L 275 335 L 284 306 L 260 288 L 289.5 288 Z" fill="#CE1126"/>
+        <path d="M 450 260 L 460.5 288 L 490 288 L 466 306 L 475 335 L 450 316 L 425 335 L 434 306 L 410 288 L 439.5 288 Z" fill="#CE1126"/>
+        <path d="M 600 260 L 610.5 288 L 640 288 L 616 306 L 625 335 L 600 316 L 575 335 L 584 306 L 560 288 L 589.5 288 Z" fill="#CE1126"/>
+      </svg>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Initialize year
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // Sticky header
+  const header = document.getElementById('header');
+  window.addEventListener('scroll', () => {
+    header.classList.toggle('scrolled', window.scrollY > 8);
+  });
+
+  // Translation Dictionary
+  const translations = {
+    ar: {
+      nav_logo: "Revils | ريفلز",
+      nav_features: "المميزات",
+      nav_contact: "اتصل بنا",
+      nav_demo: "طلب عرض توضيحي",
+      hero_badge: "مصمم خصيصاً لشركات الصرافة",
+      hero_title: "وداعاً لإكسل. <br><span class='gradient-text'>نظام محاسبي متكامل</span> لأعمالك.",
+      hero_sub: "ريفلز يستبدل الجداول الإلكترونية (إكسل) والفوضى بنظام محاسبي احترافي. تتبع العملات المتعددة، سجل العمليات، واستخرج التقارير بضغطة زر.",
+      hero_cta1: "اكتشف المميزات",
+      hero_cta2: "تواصل معنا",
+      hero_trust: "موثوق من قبل +15 شركة صرافة حول العالم",
+      stat_1: "شركة صرافة تثق بنا",
+      stat_2: "عملية تمت معالجتها",
+      stat_3: "استقرار ووقت تشغيل",
+      stat_4: "جاهزية للتدقيق المالي",
+      feat_eyebrow: "المميزات",
+      feat_title: "كل ما تحتاجه شركة الصرافة. في مكان واحد.",
+      feat_sub: "تم تصميم ريفلز ليلغي الاعتماد على إكسل ويوفر لك أدوات احترافية لإدارة أعمالك اليومية.",
+      feat_wa_title: "سجلات واتساب",
+      feat_wa_desc: "يتم إرسال تقرير بكل عملية تلقائياً إلى محادثتك أو مجموعتك على واتساب لضمان الشفافية.",
+      feat_pdf_title: "تصدير PDF",
+      feat_pdf_desc: "تصدير تفاصيل العمليات والتقارير المالية في ملفات PDF احترافية بسهولة تامة.",
+      feat_ov_title: "صفحة النظرة العامة",
+      feat_ov_desc: "لوحة تحكم تفاعلية تعرض لك حجم التداول والأرباح وحركة العملات في الوقت الفعلي.",
+      feat_sum_title: "صفحة الملخص التفصيلي",
+      feat_sum_desc: "تقارير مفصلة لكل حركة، مع إمكانية تصفية العمليات حسب التاريخ أو العملة أو الموظف.",
+      feat_lang_title: "دعم اللغتين",
+      feat_lang_desc: "واجهة مستخدم كاملة تدعم اللغتين العربية والإنجليزية، مع تغيير فوري للاتجاه (RTL / LTR).",
+      feat_curr_title: "تعدد العملات",
+      feat_curr_desc: "تسجيل العمليات بكل العملات التي تتعامل بها، مع حفظ سعر الصرف في لحظة إتمام العملية.",
+      contact_eyebrow: "تواصل معنا",
+      contact_title: "جاهز للانتقال من إكسل إلى ريفلز؟",
+      contact_sub: "انضم إلى مئات شركات الصرافة التي تعتمد على ريفلز. فريقنا جاهز للإجابة على استفساراتك وتقديم عرض توضيحي.",
+      contact_phone_label: "رقم الهاتف",
+      contact_email_label: "البريد الإلكتروني",
+      made_in: "صنع في سوريا"
+    },
+    en: {
+      nav_logo: "Revils",
+      nav_features: "Features",
+      nav_contact: "Contact",
+      nav_demo: "Request a demo",
+      hero_badge: "Purpose-built for exchange businesses",
+      hero_title: "Goodbye Excel. <br><span class='gradient-text'>A complete accounting system</span> for your business.",
+      hero_sub: "Revils replaces messy spreadsheets and Excel with a professional accounting system. Track multi-currencies, record transactions, and export reports in one click.",
+      hero_cta1: "Explore features",
+      hero_cta2: "Contact us",
+      hero_trust: "Trusted by 15+ exchange houses worldwide",
+      stat_1: "Exchange houses trust us",
+      stat_2: "Transactions processed",
+      stat_3: "Uptime & stability",
+      stat_4: "Audit-ready",
+      feat_eyebrow: "Features",
+      feat_title: "Everything an exchange house needs. In one place.",
+      feat_sub: "Revils was designed to eliminate the reliance on Excel and give you professional tools to manage your daily operations.",
+      feat_wa_title: "WhatsApp Logs",
+      feat_wa_desc: "A detailed report of every transaction is sent automatically to your WhatsApp chat or group for transparency.",
+      feat_pdf_title: "PDF Export",
+      feat_pdf_desc: "Easily export transaction details and financial reports into professional PDF files.",
+      feat_ov_title: "Overview Page",
+      feat_ov_desc: "An interactive dashboard showing your trading volume, profits, and currency movements in real-time.",
+      feat_sum_title: "Detailed Summary",
+      feat_sum_desc: "Detailed reports for every movement, with the ability to filter transactions by date, currency, or employee.",
+      feat_lang_title: "Bilingual Support",
+      feat_lang_desc: "A full user interface supporting both Arabic and English, with instant direction switching (RTL / LTR).",
+      feat_curr_title: "Multi-Currency",
+      feat_curr_desc: "Record transactions in all currencies you trade, saving the exact exchange rate at the moment of the transaction.",
+      contact_eyebrow: "Contact Us",
+      contact_title: "Ready to move from Excel to Revils?",
+      contact_sub: "Join hundreds of exchange houses relying on Revils. Our team is ready to answer your questions and provide a demo.",
+      contact_phone_label: "Phone Number",
+      contact_email_label: "Email Address",
+      made_in: "Made in Syria"
+    }
+  };
+
+  let currentLang = 'ar';
+
+  function toggleLanguage() {
+    currentLang = currentLang === 'ar' ? 'en' : 'ar';
+    
+    // Update HTML tag for direction and font
+    document.documentElement.lang = currentLang;
+    document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+    
+    // Update button text
+    document.getElementById('lang-text').textContent = currentLang === 'ar' ? 'English' : 'عربي';
+    
+    // Update all elements with data-i18n attribute
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (translations[currentLang][key]) {
+        el.innerHTML = translations[currentLang][key];
+      }
+    });
+
+    // Update footer copyright
+    const footerCopy = document.getElementById('footer-copy');
+    footerCopy.innerHTML = `© <span id="year">${new Date().getFullYear()}</span> Revils. ${currentLang === 'ar' ? 'جميع الحقوق محفوظة.' : 'All rights reserved.'}`;
+  }
+</script>
+</body>
+</html>
